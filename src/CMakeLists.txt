@@ -17,12 +17,13 @@ SET(PARENT_DIR "${CMAKE_CURRENT_SOURCE_DIR}" CACHE INTERNAL "Parent Directory")
 #include_directories(LibDirName)
 
 # Add project subdirectories.
-add_subdirectory(hrdint)
+add_subdirectory(libs/wiringpi)
+add_subdirectory(hrdint/oleddisp)
 #add_subdirectory(LibDirName)
 
 # Create the executable.
 add_executable(${PROJECT_NAME} main.cpp)
-target_link_libraries(${PROJECT_NAME} hrdint)
+target_link_libraries(${PROJECT_NAME} oleddisp)
 #target_link_libraries(${PROJECT_NAME} LibName)
 
 # Add custom build commands to execute.
