@@ -7,7 +7,7 @@
  	
  	<!-- Define the main classes for the JARs -->
     <property name="package.main"    value="com.uc.cubecats.packager.DistPackage"/>
-    <property name="archive.main"    value="com.uc.cubecats.archiver.DistPackage"/>
+    <property name="archive.main"    value="com.uc.cubecats.archiver.ProjectArchiver"/>
  	
  	<!-- Define the output JARS to create. -->
     <property name="package.jar"    value="DistPackage.jar"/>
@@ -56,6 +56,8 @@
     <target name="deploy" depends="dist">
           <copy file="${dist.dir}/${archive.jar}" tofile="../${archive.jar}"/>
           <copy file="${dist.dir}/${package.jar}" tofile="../${package.jar}"/>
+          <delete dir="${build.dir}"/>
+          <delete dir="${dist.dir}"/>
     </target>
  	
  </project>

@@ -1,9 +1,18 @@
-#include "Python.h"
+#include <Python.h>
+#include "hrdint/oleddisp/oleddisp.h"
 
 int main() {
-	Py_Initialize();
-	// Return zero (success).
 
-	Py_Finalize();
+    // Initialize the Python Interpreter
+    Py_Initialize();
+	
+	OledDisp* test = new OledDisp();
+	test->PrintText(PyUnicode_FromString("Hello World!"));
+	delete test;
+
+    // Finish the Python Interpreter
+    Py_Finalize();
+	
+	// Return Zero (Success).
 	return 0;
 };

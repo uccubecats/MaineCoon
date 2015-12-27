@@ -1,18 +1,27 @@
 package com.uc.cubecats.packager;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-import com.uc.cubecats.archiver.ArchiveManager;
-
+/**
+ * This class acts as a simple utility designed to "package" CubeCats
+ * formatted projects into its distribution (dist) directory from the
+ * build directory.  It essentially copies the first-level executable
+ * (the application) and all contained dynamic libraries.
+ * 
+ * @author Tyler Parcell
+ * @version 1.0
+ *
+ */
 public class DistPackage {
-	
-	// Variables
-	private static boolean isArchiving;
-	private static String inputPath;
-	private static String outputPath;
-	private static String filename;
-	private static String[] excludes;
+
+	// Constants
+	private static String PATH_IN = "../build";		// String used to reference the application's build directory.
+	private static String PATH_OUT = "../dist";		// String used to reference the application's dist directory.
 	
 	/**
 	 * This function serves as the entry point into the utility to begin
@@ -23,127 +32,156 @@ public class DistPackage {
 	 */
 	public static void main(String[] args) {
 		
-		/* Parse the terminal arguments to determine the actions to be carried out. */
-		boolean argsPassed = parseArguments(args);
-		
-		/* Print out an error message and exit if the argument parsing failed. */
-		if(!argsPassed) {
-			// TODO - error...
-			System.exit(1);
-		}
-		
-		/* Carry-out the appropriate action desired by the user. */
-		if(isArchiving) {
-			archiveFiles();
-		} else {
-			extractArchive();
-		}
-		
-	}
-	
-	private static void setupDefaults() {
-		isArchiving = true;
-		inputPath = "..";
-		outputPath = "../archive";
-		filename = "archive.exx";
-		excludes = null;
-	}
-	
-	private static boolean parseArguments(String[] args) {
-		
-		/* Create a flag to determine if the arguments supplied are sufficient. */
-		boolean argsPassed = false;
-		
-		/* Create a flag specifically for verifying the mode was set properly. */
-		boolean modeIsValid = false;
-		
-		/* Setup any default values for arguments. */
-		setupDefaults();
-		
-		/* Go through each argument to extract the info. */
-		for(int i = 0; i < args.length; i++) {
-			
-			/* Case for the "inputDir" argument. */
-			if(args[i].startsWith("-inputDir=")) {
-				inputPath = args[i].substring(10, args[i].length());
-			}
-			
-			/* Case for the "outputDir" argument. */
-			if(args[i].startsWith("-outputDir=")) {
-				outputPath = args[i].substring(11, args[i].length());
-			}
-			
-			/* Case for the "mode" argument. */
-			if(args[i].startsWith("-mode=")) {
-				String modeTmp = args[i].substring(6, args[i].length());
-				if(modeTmp.equalsIgnoreCase("archive")) {
-					isArchiving = true;
-					modeIsValid = true;
-				} else if(modeTmp.equalsIgnoreCase("extract")) {
-					isArchiving = false;
-					modeIsValid = true;
-				}
-			}
-			
-			/* Case for the "mode" argument. */
-			if(args[i].startsWith("-filename=")) {
-				filename = args[i].substring(10, args[i].length());
-				if(!filename.toLowerCase().endsWith(".exx")) {
-					filename += ".exx";
-				}
-			}
-			
-			/* Case for the "exclude" argument. */
-			if(args[i].startsWith("-exclude=")) {
-				excludes = args[i].substring(11, args[i].length()).split(",");
-			}
-		}
-		
-		/* Determine if the arguments were properly parsed. */
-		argsPassed = modeIsValid && (inputPath != null) && (outputPath != null) && (filename != null);
-		
-		/* Return the results of the argument parsing. */
-		return argsPassed;
-	}
-
-	private static void archiveFiles() {
-		
-		/* Get a reference to the input path. */
-		File copyDir = new File(inputPath);
+		/* Get a reference to the build path. */
+		File buildDir = new File(PATH_IN);
 		
 		/* Verify that the build path exists before proceeding. */
-		if(!(copyDir.exists() && copyDir.isDirectory())) {
+		if(!(buildDir.exists() && buildDir.isDirectory())) {
 			return;
 		}
 		
-		/* If the archive path doesn't exist, create it. */
-		File archiveDir = new File(outputPath);
-		if(!archiveDir.exists()) {
-			archiveDir.mkdir();
+		/* If the "dist" path doesn't exist, create it. */
+		File distDir = new File(PATH_OUT);
+		if(!distDir.exists()) {
+			distDir.mkdir();
 		}
 		
-		/* Setup the archive manager and add the exclusion patterns if applicable. */
-		ArchiveManager archiveManager = new ArchiveManager();
-		if(excludes != null) {
-			archiveManager.addExcludes(excludes);
-		}
+		/* Get a list of executables and libraries to copy. */
+		List<File> copyList = new ArrayList<File>();
+		evaluateFile(buildDir, copyList);
 		
-		/* Create the archive. */
-		try {
-			archiveManager.archiveFile(copyDir, new File(outputPath + File.separator + filename), true);
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.exit(1);
+		/* Begin going through each file in the list. */
+		int copyListSize = copyList.size();
+		for(int i = 0; i < copyListSize; i++) {
+			
+			/* Attempt to copy the file to the "dist" directory. */
+			try {
+				copyFile(copyList.get(i), new File(PATH_OUT + File.separator + copyList.get(i).getName()));
+				
+				/* If it was a linux/unix executable, "fix it" after copying it. */
+				if(!copyList.get(i).getName().contains(".")) {
+					Process p;
+					try {
+						p = Runtime.getRuntime().exec("chmod +x " + String.valueOf(PATH_OUT + File.separator + copyList.get(i).getName()));
+						p.waitFor();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			
+			/* Catch exceptions and print them. */
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
-	private static void extractArchive() {
-		ArchiveManager archiveManager = new ArchiveManager();
+	/**
+	 * This function is designed to recursively build a list of libraries and executables
+	 * by leveraging the evaluateFileHelper function also located in this class.
+	 * Specifically, this function also copies executable files, not just libraries.
+	 * 
+	 * @param buildDir The directory to get the files from.
+	 * @param copyList The list to put the files to copy in.
+	 */
+	private static void evaluateFile(File buildDir, List<File> copyList) {
+		
+		/* Get a list of all files and directories in the current file. */
+		File[] subDirs = buildDir.listFiles();
+		
+		/* Go through each file in the directory. */
+		for(int i = 0; i < subDirs.length; i++) {
+			
+			/* If the file is a file, check to see if it's one we want to copy. */
+			if(subDirs[i].isFile()) {
+				
+				/* Check to see if the current file is a library, if so, add it. */
+				if(subDirs[i].getAbsolutePath().toLowerCase().endsWith(".so")) {
+					copyList.add(subDirs[i]);
+				} else if(subDirs[i].getAbsolutePath().toLowerCase().endsWith(".dll")) {
+					copyList.add(subDirs[i]);
+				
+				/* Check to see if the current file is an executable file, if so, add it. */
+				} else if(subDirs[i].canExecute()) {
+					if(subDirs[i].getAbsolutePath().toLowerCase().endsWith(".exe")) {
+						copyList.add(subDirs[i]);
+					} else if(!subDirs[i].getName().toLowerCase().contains(".")) {
+						if(subDirs[i].getName().compareToIgnoreCase("Makefile") != 0) {
+							copyList.add(subDirs[i]);
+						}
+					}
+				}
+			
+			/* If the file is actually a directory, recursively call the helper copy function. */
+			} else {
+				evaluateFileHelper(subDirs[i], copyList);
+			}
+		}
+	}
+
+	/**
+	 * Function used to recursively create a list of libraries starting at the given directory.
+	 * 
+	 * @param buildDir The directory to get the files from.
+	 * @param copyList The list to put the files to copy in.
+	 */
+	private static void evaluateFileHelper(File buildDir, List<File> copyList) {
+		
+		/* Get a list of all files and directories in the current file. */
+		File[] subDirs = buildDir.listFiles();
+		
+		/* Go through each file in the directory. */
+		for(int i = 0; i < subDirs.length; i++) {
+			if(subDirs[i].isFile()) {
+				
+				/* Check to see if the current file is a library, if so, add it. */
+				if(subDirs[i].getAbsolutePath().toLowerCase().endsWith(".so")) {
+					copyList.add(subDirs[i]);
+				} else if(subDirs[i].getAbsolutePath().toLowerCase().endsWith(".dll")) {
+					copyList.add(subDirs[i]);
+				}
+				
+			/* If the file is actually a directory, recursively call the helper copy function. */
+			} else {
+				evaluateFileHelper(subDirs[i], copyList);
+			}
+		}
+	}
+	
+	/**
+	 * Function used to copy a given file to the destination file.
+	 * 
+	 * @param src The file to copy from.
+	 * @param dst The file to copy to.
+	 * @throws IOException
+	 */
+	private static void copyFile(File src, File dst) throws IOException {
+		
+		/* Open up both the source and destination locations. */
+		FileInputStream inStream = new FileInputStream(src);
+		FileOutputStream outStream = new FileOutputStream(dst);
+		
+		/* Create a buffer to store the data in while copying. */
+		byte[] buffer = new byte[1024];
+
+		/* Attempt to copy the file. */
 		try {
-			archiveManager.extractArchive(new File(inputPath + File.separator + filename), new File(outputPath), true, true);
+			int length;
+			while((length = inStream.read(buffer)) > 0) {
+					outStream.write(buffer, 0, length);
+			}
+		
+		/* If the operation fails, output the error. */
 		} catch (IOException e) {
 			e.printStackTrace();
+		
+		/* Close all file references. */
+		} finally {
+			inStream.close();
+			outStream.flush();
+			outStream.close();
 		}
+		
 	}
 	
 }
