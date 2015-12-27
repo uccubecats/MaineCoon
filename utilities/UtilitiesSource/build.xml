@@ -1,0 +1,61 @@
+ <project name="CubeCatsUtilities" basedir="." default="deploy">
+
+ 	<!-- Define the directories to use. -->
+ 	<property name="src.dir"         value="./src"/>
+    <property name="build.dir"       value="./bin"/>
+    <property name="dist.dir"        value="./dist"/>
+ 	
+ 	<!-- Define the main classes for the JARs -->
+    <property name="package.main"    value="com.uc.cubecats.packager.DistPackage"/>
+    <property name="archive.main"    value="com.uc.cubecats.archiver.DistPackage"/>
+ 	
+ 	<!-- Define the output JARS to create. -->
+    <property name="package.jar"    value="DistPackage.jar"/>
+    <property name="archive.jar"    value="ProjectArchiver.jar"/>
+ 	
+ 	<!-- Remove all temporary directories before building. -->
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+        <delete dir="${dist.dir}"/>
+        <mkdir dir="${build.dir}"/>
+    	<mkdir dir="${dist.dir}"/>
+    </target>
+ 	
+ 	<!-- Compile all the source files in the project. -->
+ 	<target name="build" depends="clean">
+ 		 <javac srcdir="${src.dir}"
+ 		         destdir="${build.dir}"
+ 		         debug="on"
+ 		         source="1.7"
+ 		 />
+ 	</target>
+ 	
+ 	<!-- Create all the JARS defined by this project. -->
+ 	<target name="dist" depends="build">
+ 		
+ 		<!-- Create the DistPackage JAR. -->
+ 		 <jar destfile="${dist.dir}/${package.jar}"
+ 		       basedir="${build.dir}"
+ 		       includes="**/packager/*.class">
+            <manifest>
+                <attribute name="Main-Class" value="${package.main}"/>
+            </manifest>
+ 		 </jar>
+        
+        <!-- Create the ProjectArchiver JAR. -->
+        <jar destfile="${dist.dir}/${archive.jar}"
+              basedir="${build.dir}"
+              includes="**/archiver/*.class" >
+            <manifest>
+                <attribute name="Main-Class" value="${archive.main}"/>
+            </manifest>
+        </jar>
+ 	</target>
+
+    <!-- Copy the output JARS to the utilities directory (up one from root). -->
+    <target name="deploy" depends="dist">
+          <copy file="${dist.dir}/${archive.jar}" tofile="../${archive.jar}"/>
+          <copy file="${dist.dir}/${package.jar}" tofile="../${package.jar}"/>
+    </target>
+ 	
+ </project>
