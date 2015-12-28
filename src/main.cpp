@@ -1,13 +1,14 @@
 #include <Python.h>
-#include "hrdint/oleddisp/oleddisp.h"
+//#include "hrdint/oleddisp/oleddisp.h"
+#include "hrdint/slowscan/slowscan.h"
 
 int main() {
 
     // Initialize the Python Interpreter
     Py_Initialize();
 	
-	OledDisp* test = new OledDisp();
-	test->PrintText(PyUnicode_FromString("Hello World!"));
+	SlowScan* test = new SlowScan();
+	test->playFile(PyUnicode_FromString("Hello World!"));
 	delete test;
 
     // Finish the Python Interpreter
