@@ -31,7 +31,6 @@ add_subdirectory(libs/wiringpi)
 add_subdirectory(hrdint/oleddisp)
 add_subdirectory(hrdint/slowscan)
 add_subdirectory(hrdint/uharp)
-#add_subdirectory(LibDirName)
 
 # Create the executable.
 add_executable(${PROJECT_NAME} main.cpp)
@@ -39,7 +38,6 @@ target_link_libraries(${PROJECT_NAME} oleddisp)
 target_link_libraries(${PROJECT_NAME} slowscan)
 target_link_libraries(${PROJECT_NAME} uharp)
 target_link_libraries(${PROJECT_NAME} ${PYTHON_LIBRARIES})
-#target_link_libraries(${PROJECT_NAME} LibName)
 
 # Add custom build commands to execute.
-add_custom_command(TARGET ${PROJECT_NAME} COMMAND java -jar ../utilities/DistPackage.jar)
+add_custom_command(TARGET ${PROJECT_NAME} COMMAND java -jar ../utilities/DistPackage.jar hrdint/oleddisp hrdint/slowscan)
