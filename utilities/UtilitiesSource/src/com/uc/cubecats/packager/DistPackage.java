@@ -74,6 +74,32 @@ public class DistPackage {
 				e.printStackTrace();
 			}
 		}
+		
+		/* Copy all specified Python scripts to the dist directory. */
+		for(int i = 0; i < args.length; i++) {
+			
+			/* Verify that the specified file is valid. */
+			File currPyFile = new File(buildDir.getAbsolutePath() + File.separator + args[i]);
+			if(currPyFile.exists()) {
+		
+				/* Create a list of all Python files specified as command-line arguments. */
+				List<File> pythonFilesList = new ArrayList<File>();
+				List<String> relativePath = new ArrayList<String>();
+				findPyFiles(currPyFile, pythonFilesList, relativePath, "");
+				
+				/* Try to copy the files to the dist directory. */
+				for(int j = 0; j < pythonFilesList.size(); j++) {
+					try {
+						System.out.println("Copying: " + relativePath.get(j) + File.separator + pythonFilesList.get(j).getName());
+						File rootFile = new File(PATH_OUT + File.separator + relativePath.get(j));
+						rootFile.mkdirs();
+						copyFile(pythonFilesList.get(j), new File(rootFile.getAbsolutePath() + File.separator + pythonFilesList.get(j).getName()));
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
 	}
 
 	/**
@@ -182,6 +208,28 @@ public class DistPackage {
 			outStream.close();
 		}
 		
+	}
+	
+	private static void findPyFiles(File currDirFull, List<File> fileList, List<String> relativePath, String currDir) {
+		
+		/* Get a list of all files and directories in the current file. */
+		File[] subDirs = currDirFull.listFiles();
+		
+		/* Go through each file in the directory. */
+		for(int i = 0; i < subDirs.length; i++) {
+			if(subDirs[i].isFile()) {
+				
+				/* Determine if the current file in the directory is a python script and add it if so. */
+				if(subDirs[i].getName().toLowerCase().endsWith(".py")) {
+					fileList.add(subDirs[i]);
+					relativePath.add(currDir);
+				}
+				
+			/* If the file is actually a directory, recursively call the findPyFiles function. */
+			} else {
+				findPyFiles(subDirs[i], fileList, relativePath, currDir + (currDir.equals("") ? "" : File.separator) + subDirs[i].getName());
+			}
+		}
 	}
 	
 }
