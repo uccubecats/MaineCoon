@@ -29,12 +29,14 @@ include_directories(${PYTHON_INCLUDE_DIRS})
 # Add project subdirectories.
 add_subdirectory(libs/wiringpi)
 add_subdirectory(hrdint/oleddisp)
+#add_subdirectory(hrdint/tempPress)
 add_subdirectory(hrdint/slowscan)
 add_subdirectory(hrdint/uharp)
 
 # Create the executable.
 add_executable(${PROJECT_NAME} main.cpp)
 target_link_libraries(${PROJECT_NAME} oleddisp)
+#target_link_libraries(${PROJECT_NAME} tempPress)
 target_link_libraries(${PROJECT_NAME} slowscan)
 target_link_libraries(${PROJECT_NAME} uharp)
 target_link_libraries(${PROJECT_NAME} ${PYTHON_LIBRARIES})
