@@ -10,7 +10,7 @@ Mux::Mux()
 	wiringPiI2CSetup(fDMagnetometer);
 	//pinmode(sdaPin, INPUT);   //confirm input
 	//pinmode(sclPin, OUTPUT);
-	pinmode(gpioForMuxPin, OUTPUT);
+	pinMode(gpioForMuxPin, OUTPUT);
 }
 
 //getters, just in case

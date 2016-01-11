@@ -12,6 +12,7 @@ SET(VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 
 # Global reference to the parent directory.
 SET(PARENT_DIR "${CMAKE_CURRENT_SOURCE_DIR}" CACHE INTERNAL "Parent Directory")
+SET(CMAKE_CXX_FLAGS "-pthread -I/usr/local/include -L/usr/local/lib -lwiringPi")
 
 # Copy all required Files over.
 file(COPY ${PARENT_DIR}/hrdint/oleddisp/pyoleddisp.py DESTINATION ${PARENT_DIR}/../build/hrdint/oleddisp)
@@ -29,14 +30,14 @@ include_directories(${PYTHON_INCLUDE_DIRS})
 # Add project subdirectories.
 add_subdirectory(libs/wiringpi)
 add_subdirectory(hrdint/oleddisp)
-#add_subdirectory(hrdint/tempPress)
+add_subdirectory(hrdint/tempPress)
 add_subdirectory(hrdint/slowscan)
 add_subdirectory(hrdint/uharp)
 
 # Create the executable.
 add_executable(${PROJECT_NAME} main.cpp)
 target_link_libraries(${PROJECT_NAME} oleddisp)
-#target_link_libraries(${PROJECT_NAME} tempPress)
+target_link_libraries(${PROJECT_NAME} tempPress)
 target_link_libraries(${PROJECT_NAME} slowscan)
 target_link_libraries(${PROJECT_NAME} uharp)
 target_link_libraries(${PROJECT_NAME} ${PYTHON_LIBRARIES})
