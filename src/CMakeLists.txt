@@ -28,7 +28,6 @@ find_package(PythonLibs REQUIRED)
 include_directories(${PYTHON_INCLUDE_DIRS})
 
 # Add project subdirectories.
-add_subdirectory(libs/wiringpi)
 add_subdirectory(hrdint/oleddisp)
 add_subdirectory(hrdint/tempPress)
 add_subdirectory(hrdint/slowscan)
