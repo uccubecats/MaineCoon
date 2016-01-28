@@ -12,7 +12,7 @@ class OledDisp:
 		self.DC_PIN    = 16
 		
 		# Very important... This lets py-gaugette 'know' what pins to use in order to reset the display
-		self.led = SSD1306.SSD1306(reset_pin=RESET_PIN, dc_pin=DC_PIN)
+		self.led = SSD1306.SSD1306_128_64(rst=RESET_PIN, dc=DC_PIN)
 		self.led.begin()
 		self.led.clear_display() # This clears the display but only when there is a led.display() as well!
 		
