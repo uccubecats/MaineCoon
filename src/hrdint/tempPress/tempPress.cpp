@@ -2,12 +2,14 @@
 //Also retrieving magnetometer data (without the MUX)
 
 #include "tempPress.h"
+#include <iostream>
 
 //constructor
 Mux::Mux()
 {
-	wiringPiI2CSetup(fDTempPress);
-	wiringPiI2CSetup(fDMagnetometer);
+	fDTempPress = wiringPiI2CSetup(fDTempPress);
+	fDMagnetometer = wiringPiI2CSetup(fDMagnetometer);
+	std::cout << fDTempPress << " " << fDMagnetometer << std::endl;
 	//pinmode(sdaPin, INPUT);   //confirm input
 	//pinmode(sclPin, OUTPUT);
 	pinMode(gpioForMuxPin, OUTPUT);
@@ -47,7 +49,7 @@ int Mux::getTemperature(int binarySensorValue)
 	delay(1);
 	int most=wiringPiI2CReadReg16 (fDTempPress, tMSB);
 	int least=wiringPiI2CReadReg16 (fDTempPress, tLSB);
-
+	std::cout << most << " " << least << std::endl; 
 	return ((256*most)+least);
 }
 //And neither the angels in Heaven above, Nor the demons down under the sea,
@@ -69,6 +71,7 @@ int Mux::getPressure(int binarySensorValue)
 	}
 
 	delay(1);
+	wiringPiI2CRead(fDTempPress);
 	int most=wiringPiI2CReadReg16 (fDTempPress, pMSB);
 	int least=wiringPiI2CReadReg16 (fDTempPress, pLSB);
 
