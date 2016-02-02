@@ -11,6 +11,8 @@ Mux::Mux()
 	//pinmode(sdaPin, INPUT);   //confirm input
 	//pinmode(sclPin, OUTPUT);
 	pinMode(gpioForMuxPin, OUTPUT);
+	
+	wiringPiI2CWrite(fDTempPress, 0x1E);
 }
 
 //getters, just in case
@@ -43,7 +45,9 @@ int Mux::getTemperature(int binarySensorValue)
 	{
 		return -1;		//invalid input
 	}
-
+	
+	wiringPiI2CWrite(fDTempPress, 0x00);
+	
 	delay(1);
 	int most=wiringPiI2CReadReg16 (fDTempPress, tMSB);
 	int least=wiringPiI2CReadReg16 (fDTempPress, tLSB);

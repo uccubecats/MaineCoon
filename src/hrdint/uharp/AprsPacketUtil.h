@@ -9,7 +9,7 @@ const int C = 2;	// Index representing the c-ceofficent in an array.
 const int X = 3;	// Index representing the x-value in an array.
 
 // Specify the aprs namespace
-namespace aprs {
+class aprs {
 
 	// Implementation of the absolute value function.
 	float abs(float x);
