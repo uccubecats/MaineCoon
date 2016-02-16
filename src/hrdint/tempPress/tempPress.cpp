@@ -84,4 +84,14 @@ int Mux::getOrientation()
 	return theta;
 }
 
+void setTemperature(int temperature){
+	return;
+}
+void setPressure(int pressure){
+	return;
+}
+void setMagnetometer(int magnet){
+	return;
+}
+
 //fin.

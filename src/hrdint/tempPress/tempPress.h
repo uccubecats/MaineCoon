@@ -35,4 +35,7 @@ public:
 	int getTemperature(int binarySensorValue);
 	int getPressure(int binarySensorValue);
 	int getOrientation();
+	void setTemperature(int temperature);
+	void setPressure(int pressure);
+	void setMagnetometer(int magnet); // need to figure out what the pass value is
 };
