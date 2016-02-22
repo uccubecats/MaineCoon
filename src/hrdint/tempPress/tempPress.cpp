@@ -13,6 +13,7 @@ Mux::Mux()
 	//pinmode(sdaPin, INPUT);   //confirm input
 	//pinmode(sclPin, OUTPUT);
 	pinMode(gpioForMuxPin, OUTPUT);
+
 }
 
 //getters, just in case
@@ -49,7 +50,11 @@ int Mux::getTemperature(int binarySensorValue)
 	delay(1);
 	int most=wiringPiI2CReadReg16 (fDTempPress, tMSB);
 	int least=wiringPiI2CReadReg16 (fDTempPress, tLSB);
-	std::cout << most << " " << least << std::endl; 
+	std::cout << most << " " << least << std::endl;
+
+	m_temperature = 256 * most + least;
+	sendTemperature(binarySensorValue);
+
 	return ((256*most)+least);
 }
 //And neither the angels in Heaven above, Nor the demons down under the sea,
@@ -75,22 +80,44 @@ int Mux::getPressure(int binarySensorValue)
 	int most=wiringPiI2CReadReg16 (fDTempPress, pMSB);
 	int least=wiringPiI2CReadReg16 (fDTempPress, pLSB);
 
+	m_pressure = 256 * most + least;
+	sendPressure(binarySensorValue);
+
 	return ((256*most)+least);
 }
 int Mux::getOrientation()
 {
 //TO DO: MATH!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	int theta;
+
+	m_orientation = theta;
+
+	sendOrienation();
+
 	return theta;
 }
 
-void setTemperature(int temperature){
+
+void sendTemperature(int binarySensorValue){
+	if (binarySensorValue == 1){
+		temperatureInside = m_temperature;
+	} else {
+		temperatureOutside = m_temperature;
+	}
 	return;
 }
-void setPressure(int pressure){
+
+void sendPressure(int binarySensorValue){
+	if (binarySensorValue == 1){
+		pressureInside = m_pressure;
+	} else {
+		pressureOutside = m_pressure;
+	}
 	return;
 }
-void setMagnetometer(int magnet){
+
+void sendOrienation(){
+	orientation = m_orientation;
 	return;
 }
 
