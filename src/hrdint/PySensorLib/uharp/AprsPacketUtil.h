@@ -27,8 +27,8 @@ namespace aprs {
 	int* getAprsValues(float value);
 	
 	// Function used to get the coefficent string in the APRS packet format.
-	unsigned int getCoeffString(char* buffer, std::string callTag, int* aArray, int* bArray, int* cArray);
+	std::string getCoeffString(std::string callTag, int* aArray, int* bArray, int* cArray);
 	
 	// Function used to get the x string in the APRS packet format.
-	unsigned int getXString(char* buffer, int* xArray);
+	std::string getXString(int* xArray);
 };

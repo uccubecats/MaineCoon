@@ -9,7 +9,7 @@ class Mux
 
 	//fields. but more like constants. lots of constants. there aren't actually any fields.
 public:
-	const int intSensor=0, extSensor=1,
+	int intSensor=0, extSensor=1,
 							//binary values of the temp/press sensors (internal and external)
 							//randomly assigned for MUX use only
 
@@ -17,7 +17,7 @@ public:
 							//pi pin #s for SDA, SCL, and the GPIO pin for our MUX
 							//gpioForMuxPin was arbitrarily chosen; all options are 29, 31-33, 35-38
 
-		fDTempPress=0x60, fDMagnetometer=0x0E,
+		fDTempPress=0x76, fDMagnetometer=0x0E,
 							//fd address for temp/press sensors and magnetometer
 							//both temp/press sensors have the same address, hence the need of a MUX
 

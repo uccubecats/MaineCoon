@@ -3,6 +3,7 @@
 #include "hrdint/slowscan/slowscan.h"
 #include "hrdint/tempPress/tempPress.h"
 #include <iostream>
+#include "hrdint/pthread/pthread.h"
 
 /** Unix-like platform char * to wchar_t conversion. */
 wchar_t *nstrws_convert(char *raw) {
@@ -43,10 +44,19 @@ int main(int argc, char** argv) {
 	//Test for Graces code.
 	Mux* test = new Mux();
 	Temp = test -> getTemperature(0);
-	cout << Temp;
+	std::cout << Temp << std::endl;
 	Temp = test -> getTemperature(1);
-	cout << Temp;
+	std::cout << Temp << std::endl;
 
+  // Initialize thread for altimeter
+  pthread_t threads = initializeAltimeterThread();
+
+  // Cancel altimeter thread, store return value with default 0
+  int rc = pthread_cancel(threads[1]);
+
+  // Print error if rc nonzero
+  if (rc)
+    cout << "Error cancelling: code " << rc << endl;
 	//Create a new instance of OLED Display and Print "Hello World!" to it.
 	//OledDisp* test = new OledDisp();
 	//test->PrintText(PyUnicode_FromString("Hello World!"));
