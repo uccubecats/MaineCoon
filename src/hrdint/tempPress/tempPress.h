@@ -4,6 +4,23 @@
 #include <wiringPiI2C.h>
 #include <wiringPi.h>
 
+#ifdef __GNUC__ 
+#include <unistd.h> 
+#endif
+
+#ifdef _WIN32
+#include <windows.h> 
+#endif
+
+/*! Global variables for use in passing along to wrapper function.
+ *	May only be written by the Mux class.
+ */
+extern int temperatureInside = 0;
+extern int temperatureOutside = 0;
+extern int pressureInside = 0;
+extern int pressureOutside = 0;
+extern int orientation = 0;
+
 class Mux
 {
 
@@ -28,6 +45,11 @@ public:
 		pMSB=0x00, pLSB=0x01, tMSB=0x02, tLSB=0x03;
 							//register values for temperature/pressure, most/least significant bites
 
+private: // internal values used for quick passing to globals
+	int m_temperature = 0;
+	int m_pressure = 0;
+	int m_orientation = 0;
+
 	Mux();
 	int getSDAPin();
 	int getSCLPin();
@@ -35,4 +57,9 @@ public:
 	int getTemperature(int binarySensorValue);
 	int getPressure(int binarySensorValue);
 	int getOrientation();
+
+	// Send to global
+	void sendTemperature();
+	void sendPressure();
+	void sendOrientation();
 };
