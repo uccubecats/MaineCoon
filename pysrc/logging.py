@@ -4,7 +4,7 @@
 # Designed to run in a separate thread for "simultaneous execution"
 # while running on the Raspberry Pi
 
-from hrdint/PySensorLib import PySensorLib
+from PySensorLib/PySensorLib import PySensorLib
 import os
 import threading
 import time
