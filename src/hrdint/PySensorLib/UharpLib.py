@@ -6,7 +6,7 @@ class UharpLib:
 	def __init__(self, callTag):
 		self.callTag = callTag;
 		
-	def getParmString(self)
+	def getParmString(self):
 		# Create a string to perform all initial manipulations on.
 		tmpString = ":" + self.callTag + " :PARM.";
 		
@@ -19,7 +19,7 @@ class UharpLib:
 	
 		return str(tmpString);
 		
-	def getUnitString(self)
+	def getUnitString(self):
 		# Create a string to perform all initial manipulations on.
 		tmpString = ":" + self.callTag + " :PARM.";
 		
@@ -42,7 +42,7 @@ class UharpLib:
 		
 		return aprs.getXString(self.callTag, XArray);
 		
-	def getCoeffString(self, valuesArray)
+	def getCoeffString(self, valuesArray):
 		aArray = [0 0 0 0 0]
 		bArray = [0 0 0 0 0]
 		cArray = [0 0 0 0 0] 
